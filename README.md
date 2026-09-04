@@ -1,6 +1,8 @@
-# SoulLink 光头强心理陪伴数字人 Demo
+# SoulLink Demo
 
-这是一个面向心理陪伴场景的移动端数字人交互项目。项目在原有 SoulLink/Fay 后端基础上，接入了大语言模型回复、前端 3D/动画交互，以及 VoxCPM2 语音克隆接口，用于生成“光头强”风格的角色语音反馈。
+这是一个面向心理陪伴场景的移动端数字人交互项目。项目在原有 SoulLink/Fay 后端基础上，接入了大语言模型回复、前端 3D/动画交互，以及可扩展的角色语音合成接口。
+
+当前 Demo 中包含一个基于 VoxCPM2 的角色音色接入案例：通过参考音频生成指定角色的语音反馈。具体角色可以在配置中替换，项目并不绑定某一个固定角色。
 
 > 说明：本仓库只保留项目展示和二次开发所需的部分代码。真实服务器配置、API Key、模型权重、缓存、日志、音频样本和构建产物均未上传。
 
@@ -8,7 +10,7 @@
 
 - 移动端数字人交互界面：角色选择、文本输入、流式回复、实时场景面板等。
 - 心理陪伴式回复：在后端提示词中加入更温和、共情、非诊断式的对话风格。
-- VoxCPM2 音色克隆：后端通过 `tts/voxcpm2_tts.py` 调用独立的 VoxCPM2 TTS 服务，生成光头强音色的 `.wav` 语音。
+- VoxCPM2 音色克隆：后端通过 `tts/voxcpm2_tts.py` 调用独立的 VoxCPM2 TTS 服务，生成指定角色音色的 `.wav` 语音。
 - 前后端联动：移动端配置后端地址后，可通过后端接口获取文本回复和语音资源。
 - Android 打包支持：前端使用 Capacitor，可同步到 Android 工程进行真机测试。
 
@@ -29,7 +31,7 @@
 ├── gui/                            # Flask HTTP API 与后台接口
 ├── llm/                            # LLM 回复与心理陪伴提示词逻辑
 ├── tts/
-│   └── voxcpm2_tts.py              # VoxCPM2 语音克隆适配器
+│   └── voxcpm2_tts.py              # VoxCPM2 角色语音克隆适配器
 ├── asr/                            # 语音识别模块
 ├── utils/                          # 配置和工具函数
 ├── simulation_engine/              # 生成式智能体/记忆相关模块
@@ -93,8 +95,8 @@ POST /v1/audio/speech
 
 ```bash
 export VOXCPM2_API_URL=http://127.0.0.1:18890
-export VOXCPM2_REFERENCE_AUDIO_PATH=/path/to/guangtouqiang/reference.wav
-export VOXCPM2_VOICE_PROMPT="光头强的卡通男声音色，语气夸张，清晰自然"
+export VOXCPM2_REFERENCE_AUDIO_PATH=/path/to/role/reference.wav
+export VOXCPM2_VOICE_PROMPT="目标角色的声音描述，例如音色、语气、表达风格"
 export VOXCPM2_CFG_VALUE=2.0
 export VOXCPM2_INFERENCE_TIMESTEPS=10
 python main.py
