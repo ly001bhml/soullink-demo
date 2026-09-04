@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登录 - Soullink</title>
+    <link rel="icon" href="{{ url_for('static',filename='images/favicon.ico') }}" type="image/x-icon">
+    <style>
+      :root {
+        --sl-bg-1: #ffeef5;
+        --sl-bg-2: #fff5e6;
+        --sl-bg-3: #ffe4cc;
+        --sl-text: #4a3a3a;
+        --sl-panel: rgba(255, 255, 255, 0.7);
+        --sl-panel-strong: rgba(255, 255, 255, 0.85);
+        --sl-border: rgba(255, 192, 203, 0.45);
+        --sl-shadow: 0 20px 60px rgba(255, 169, 200, 0.25);
+        --sl-glass-shadow: 0 10px 30px rgba(70, 20, 40, 0.08);
+        --sl-accent: #ff7ab6;
+        --sl-accent-3: #9b7bff;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, var(--sl-bg-1) 0%, var(--sl-bg-2) 50%, var(--sl-bg-3) 100%);
+        color: var(--sl-text);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .login-shell {
+        width: 100%;
+        max-width: 420px;
+        padding: 24px;
+      }
+      .card {
+        background: var(--sl-panel);
+        border: 1px solid var(--sl-border);
+        border-radius: 20px;
+        box-shadow: var(--sl-shadow);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 28px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+      .brand img {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        box-shadow: var(--sl-glass-shadow);
+      }
+      .brand h1 {
+        font-size: 20px;
+        margin: 0;
+        font-weight: 700;
+      }
+      .subtitle {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+      .field {
+        margin-top: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 6px;
+        font-weight: 600;
+      }
+      .field input {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--sl-border);
+        background: var(--sl-panel-strong);
+        outline: none;
+        color: var(--sl-text);
+      }
+      .field input:focus {
+        border-color: rgba(155, 123, 255, 0.5);
+        box-shadow: 0 0 0 3px rgba(155, 123, 255, 0.15);
+      }
+      .actions {
+        margin-top: 20px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .btn {
+        flex: 1;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        color: #fff;
+        font-weight: 600;
+        background: linear-gradient(120deg, var(--sl-accent-3), var(--sl-accent));
+        box-shadow: 0 10px 20px rgba(123, 107, 255, 0.2);
+      }
+      .error {
+        margin-top: 12px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: rgba(255, 107, 107, 0.15);
+        border: 1px solid rgba(255, 107, 107, 0.35);
+        font-size: 12px;
+        color: #b23b3b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-shell">
+      <div class="card">
+        <div class="brand">
+          <img src="{{ url_for('static',filename='images/Logo.png') }}" alt="Soullink">
+          <div>
+            <h1>Soullink 管理后台</h1>
+            <div class="subtitle">请输入账号密码</div>
+          </div>
+        </div>
+        <form method="post">
+          <div class="field">
+            <label for="username">账号</label>
+            <input id="username" name="username" type="text" autocomplete="username" required />
+          </div>
+          <div class="field">
+            <label for="password">密码</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+          </div>
+          <div class="actions">
+            <button class="btn" type="submit">登录</button>
+          </div>
+          <div class="field" style="margin-top: 10px;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:500;">
+              <input type="checkbox" name="remember" />
+              记住我 30 天免登录
+            </label>
+          </div>
+          {% if error %}
+          <div class="error">{{ error }}</div>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

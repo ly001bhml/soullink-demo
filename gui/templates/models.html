@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>情智兼备的虚拟陪伴系统 - 模型管理</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/index.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/setting.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/element/index.css') }}">
+    <link rel="icon" href="{{ url_for('static',filename='images/favicon.ico') }}" type="image/x-icon">
+    <script src="{{ url_for('static',filename='js/vue.js') }}"></script>
+    <script src="{{ url_for('static',filename='js/element.js') }}"></script>
+    <style>
+      .models-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 20px;
+        height: 480px;
+        overflow-y: scroll;
+        margin-bottom: 20px;
+        position: relative;
+      }
+      .model-card {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        width: calc(33.33% - 20px);
+        min-width: 250px;
+        height: 280px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+      }
+      .model-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .model-card.selected {
+        border: 2px solid #409eff;
+        background-color: #ecf5ff;
+      }
+      .model-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .model-title {
+        font-weight: bold;
+        font-size: 16px;
+        color: #303133;
+      }
+      .model-status {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+      }
+      .status-active {
+        color: #67c23a;
+      }
+      .status-inactive {
+        color: #909399;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 5px;
+      }
+      .active-dot {
+        background-color: #67c23a;
+      }
+      .inactive-dot {
+        background-color: #909399;
+      }
+      .model-info {
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+      }
+      .model-label {
+        color: #606266;
+      }
+      .model-value {
+        color: #303133;
+        max-width: 60%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .model-description {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #606266;
+        line-height: 1.5;
+        max-height: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+      }
+      .model-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: auto;
+        padding-top: 15px;
+        gap: 8px;
+      }
+      .model-btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+        font-size: 12px;
+        flex: 1;
+        white-space: nowrap;
+      }
+      .select-btn {
+        background-color: #409eff;
+        color: white;
+        border: 1px solid #409eff;
+      }
+      .select-btn:hover {
+        background-color: #66b1ff;
+      }
+      .select-btn.selected {
+        background-color: #67c23a;
+        border-color: #67c23a;
+      }
+      .edit-btn {
+        background-color: #f5f7fa;
+        color: #606266;
+        border: 1px solid #dcdfe6;
+      }
+      .edit-btn:hover {
+        background-color: #ecf5ff;
+        color: #409eff;
+      }
+      .delete-btn {
+        background-color: #fff;
+        color: #f56c6c;
+        border: 1px solid #f56c6c;
+      }
+      .delete-btn:hover {
+        background-color: #fef0f0;
+      }
+      .clear-history-btn {
+        background-color: #fff;
+        color: #e6a23c;
+        border: 1px solid #e6a23c;
+      }
+      .clear-history-btn:hover {
+        background-color: #fdf6ec;
+      }
+      .add-btn-container {
+        display: flex;
+        justify-content: flex-end;
+        padding: 20px;
+      }
+      .add-btn {
+        width: 100px;
+        height: 36px;
+        border-radius: 4px;
+        background-color: #409eff;
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .add-btn:hover {
+        background-color: #66b1ff;
+      }
+      .setting_fay_top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0px 20px;
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #ebeef5;
+        margin-bottom: 10px;
+      }
+      .model-dialog {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+      }
+      .model-dialog.active {
+        display: flex;
+      }
+      .model-dialog-content {
+        background-color: white;
+        width: 500px;
+        max-width: 90%;
+        border-radius: 4px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .model-dialog-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .model-dialog-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .model-dialog-close {
+        cursor: pointer;
+        font-size: 20px;
+        color: #909399;
+      }
+      .model-dialog-body {
+        padding: 20px;
+      }
+      .model-form-item {
+        margin-bottom: 20px;
+      }
+      .model-form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #606266;
+        font-weight: 500;
+      }
+      .model-form-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dcdfe6;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      .model-form-textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dcdfe6;
+        border-radius: 4px;
+        box-sizing: border-box;
+        min-height: 100px;
+        resize: vertical;
+      }
+      .model-dialog-footer {
+        padding: 10px 20px 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      .dialog-btn {
+        padding: 8px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        border: none;
+        font-size: 14px;
+      }
+      .dialog-btn-primary {
+        background-color: #409eff;
+        color: white;
+      }
+      .dialog-btn-cancel {
+        background-color: #f5f7fa;
+        color: #606266;
+        border: 1px solid #dcdfe6;
+      }
+      .generate-attr-btn {
+        background-color: #67c23a;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-top: 10px;
+      }
+      .generate-attr-btn:hover {
+        background-color: #85ce61;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main_bg" id="app">
+      <div class="main_left">
+        <div class="main_left_logo">
+          <img src="{{ url_for('static',filename='images/Logo.png') }}" alt="">
+        </div>
+        <div class="main_left_menu">
+          <ul>
+            <li class="changeImg"><a href="/"><span class="iconimg1">消息</span></a></li>
+            <li class="changeImg2"><a href="/setting"><span class="iconimg2">人设</span></a></li>
+            <li class="changeImg4 active"><a href="/models"><span class="iconimg4">模型管理</span></a></li>
+            <li class="changeImg3" :class="{'mcp-online': mcpOnlineStatus}"><a href="/mcp"><span class="iconimg3"><span class="mcp-online-indicator"></span>MCP</span></a></li>
+          </ul>
+        </div>
+        <div class="main_left_emoji">
+          <img src="{{ url_for('static',filename='images/emoji.png') }}" alt="">
+        </div>
+      </div>
+
+      <div class="main_right">
+        <div class="setting_fay_top">
+          <span style="color: #000; font-size: 20px; padding-right: 10px;">模型管理</span>
+          <div class="add-btn-container">
+            <button class="add-btn" @click="showAddDialog">+ 添加模型</button>
+          </div>
+        </div>
+
+        <div class="setting_fay">
+          <div class="models-container">
+            <div v-for="model in models" :key="model.model_id" 
+                 class="model-card" 
+                 :class="{'selected': selectedModelId === model.model_id}"
+                 @click="selectModel(model.model_id)">
+              <div class="model-header">
+                <div class="model-title">[[model.name]]</div>
+                <div class="model-status" :class="model.is_active ? 'status-active' : 'status-inactive'">
+                  <span class="status-dot" :class="model.is_active ? 'active-dot' : 'inactive-dot'"></span>
+                  [[model.is_active ? '启用' : '禁用']]
+                </div>
+              </div>
+              <div class="model-description" v-if="model.description">
+                [[model.description]]
+              </div>
+              <div class="model-info">
+                <span class="model-label">创建者:</span>
+                <span class="model-value">[[model.creator_username || '全局']]</span>
+              </div>
+              <div class="model-info">
+                <span class="model-label">类型:</span>
+                <span class="model-value">[[model.is_global ? '全局模型' : '私有模型']]</span>
+              </div>
+              <div class="model-info" v-if="model.attributes">
+                <span class="model-label">角色:</span>
+                <span class="model-value">[[model.attributes.name || '未设置']]</span>
+              </div>
+              <div class="model-info" v-if="model.model3d_url">
+                <span class="model-label">3D模型:</span>
+                <span class="model-value" style="color: #409eff;">已配置</span>
+              </div>
+              <div class="model-info" v-if="model.created_at_str">
+                <span class="model-label">创建时间:</span>
+                <span class="model-value" style="color: #909399; font-size: 12px;">[[model.created_at_str]]</span>
+              </div>
+              <div class="model-actions">
+                <button class="model-btn select-btn" 
+                        :class="{'selected': selectedModelId === model.model_id}"
+                        @click.stop="selectModel(model.model_id)">
+                  [[selectedModelId === model.model_id ? '已选中' : '选择']]
+                </button>
+                <button class="model-btn edit-btn" @click.stop="editModel(model)">编辑</button>
+                <button class="model-btn clear-history-btn" @click.stop="clearHistory(model.model_id)">清除历史</button>
+                <button class="model-btn delete-btn" @click.stop="deleteModel(model.model_id)">删除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 添加/编辑模型对话框 -->
+      <div class="model-dialog" :class="{'active': showDialog}">
+        <div class="model-dialog-content">
+          <div class="model-dialog-header">
+            <div class="model-dialog-title">[[dialogTitle]]</div>
+            <div class="model-dialog-close" @click="closeDialog">×</div>
+          </div>
+          <div class="model-dialog-body">
+            <div class="model-form-item">
+              <label class="model-form-label">模型名称 *</label>
+              <input class="model-form-input" v-model="dialogForm.name" placeholder="请输入模型名称" />
+            </div>
+            <div class="model-form-item">
+              <label class="model-form-label">模型描述</label>
+              <textarea class="model-form-textarea" v-model="dialogForm.description" placeholder="请输入模型描述"></textarea>
+            </div>
+            <div class="model-form-item">
+              <label class="model-form-label">人物描述</label>
+              <textarea class="model-form-textarea" v-model="dialogForm.character_description" placeholder="请输入人物描述，系统将自动生成属性"></textarea>
+              <button class="generate-attr-btn" @click="generateAttributes" :disabled="generating">
+                [[generating ? '生成中...' : '生成属性']]
+              </button>
+            </div>
+            <div class="model-form-item" v-if="dialogForm.attributes">
+              <label class="model-form-label">生成的属性</label>
+              <div style="background: #f5f7fa; padding: 15px; border-radius: 4px; font-size: 13px;">
+                <div v-for="(value, key) in dialogForm.attributes" :key="key" style="margin-bottom: 8px;">
+                  <strong>[[key]]:</strong> [[value]]
+                </div>
+              </div>
+            </div>
+            <div class="model-form-item">
+              <label class="model-form-label">3D模型URL</label>
+              <input class="model-form-input" v-model="dialogForm.model3d_url" placeholder="例如: /models/model_xxx.glb (可选)" />
+              <div style="font-size: 12px; color: #909399; margin-top: 5px;">
+                输入3D模型文件的相对路径，如：/models/model_xxx.glb
+              </div>
+            </div>
+          </div>
+          <div class="model-dialog-footer">
+            <button class="dialog-btn dialog-btn-cancel" @click="closeDialog">取消</button>
+            <button class="dialog-btn dialog-btn-primary" @click="saveModel">保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='js/models.js') }}"></script>
+  </body>
+</html>
+

@@ -1,0 +1,7 @@
+{
+  "name": "SoulLink - Virtual Companion",
+  "description": "一个情智兼备的虚拟陪伴系统，提供个性化生成、情感绑定与深度互动体验。",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
